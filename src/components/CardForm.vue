@@ -99,7 +99,7 @@
         </div>
       </div>
 
-      <button class="card-form__button" v-on:click="invaildCard">{{ $t('cardForm.submit') }}</button>
+      <button class="card-form__button" v-on:click="createCard">{{ $t('cardForm.submit') }}</button>
     </div>
   </div>
 </template>
@@ -273,6 +273,9 @@ export default {
       } else {
         this.unMaskCardNumber()
       }
+    },
+    createCard () {
+      console.log('xd')
     }
   }
 }
