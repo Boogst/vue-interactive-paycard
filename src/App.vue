@@ -1,9 +1,13 @@
 <template>
   <div class="wrapper" id="app">
-    <div>
-      <UserForm/>
-    </div>
-    <div>
+      <UserForm
+        :user-data="userData"
+        @input-user-name="updateUserName"
+        @input-user-last-name="updateUserLastN"
+        @input-user-doc-type="updateUserDocType"
+        @input-user-doc-num="updateUserDocNum"
+        @input-user-prhone="updateUserPhone"
+      />
       <CardForm
         :form-data="formData"
         @input-card-number="updateCardNumber"
@@ -12,7 +16,6 @@
         @input-card-year="updateCardYear"
         @input-card-cvv="updateCardCvv"
       />
-    </div>
     <!-- backgroundImage="https://images.unsplash.com/photo-1572336183013-960c3e1a0b54?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80" -->
   </div>
 </template>
@@ -35,6 +38,13 @@ export default {
         cardMonth: '',
         cardYear: '',
         cardCvv: ''
+      },
+      userData: {
+        userName: '',
+        userLastN: '',
+        userDocType: '',
+        userDocNum: '',
+        userPhone: ''
       }
     }
   },
@@ -48,11 +58,21 @@ export default {
     updateCardYear (val) {
     },
     updateCardCvv (val) {
+    },
+    updateUserName (val) {
+    },
+    updateUserLastN (val) {
+    },
+    updateUserDocType (val) {
+    },
+    updateUserDocNum (val) {
+    },
+    updateUserPhone (val) {
     }
-  },
+  }/*,
   mounted () {
     this.$i18n.locale = navigator.language
-  }
+  },  */
 }
 </script>
 

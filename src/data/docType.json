@@ -1,0 +1,19 @@
+{
+    "docType": [
+        {
+            "id": "1",
+            "type": "C.C.",
+            "description": "Cedula de Ciudadania"
+        },
+        {
+            "id": "2",
+            "type": "T.I.",
+            "description": "Tarjeta de Identidad"
+        },
+        {
+            "id": "3",
+            "type": "C.E.",
+            "description": "Cedula de Extranjeria"
+        }
+    ]
+}

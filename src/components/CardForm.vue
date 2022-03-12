@@ -35,16 +35,21 @@
       </div>
       <div class="card-input">
         <label for="cardName" class="card-input__label">{{ $t('cardForm.cardName') }}</label>
-        <input
-          type="text"
-          :id="fields.cardName"
-          v-letter-only
-          @input="changeName"
-          class="card-input__input"
-          :value="formData.cardName"
-          data-card-field
-          autocomplete="off"
-        />
+        <select
+              class="card-input__input -select"
+              :id="fields.cardName"
+              v-model="formData.cardName"
+              @change="changeName"
+              data-card-field
+            >
+              <option value disabled selected>{{ $t('cardForm.cardName') }}</option>
+              <option
+                v-bind:value="$index.id"
+                v-for="$index in users"
+                v-bind:key="$index.id"
+              >{{$index.nombres}} {{$index.apellidos}}</option>
+            </select>
+
       </div>
       <div class="card-form__row">
         <div class="card-form__col">
@@ -90,7 +95,7 @@
               v-number-only
               :id="fields.cardCvv"
               maxlength="4"
-              :value="formData.cardCvv"
+              :value=formData.cardCvv
               @input="changeCvv"
               data-card-field
               autocomplete="off"
@@ -106,6 +111,7 @@
 
 <script>
 import Card from '@/components/Card'
+import { usersData } from '@/data/users'
 export default {
   name: 'CardForm',
   directives: {
@@ -168,7 +174,8 @@ export default {
       minCardYear: new Date().getFullYear(),
       isCardNumberMasked: true,
       mainCardNumber: this.cardNumber,
-      cardNumberMaxLength: 19
+      cardNumberMaxLength: 19,
+      users: usersData
     }
   },
   computed: {
@@ -275,7 +282,7 @@ export default {
       }
     },
     createCard () {
-      console.log('xd')
+      console.log(this.formData)
     }
   }
 }
