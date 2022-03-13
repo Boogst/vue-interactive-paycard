@@ -85,6 +85,7 @@ import Vue from 'vue'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 Vue.use(Toast)
+const headers = { 'Content-Type': 'application/json' }
 export default {
   name: 'UserForm',
   directives: {
@@ -123,6 +124,17 @@ export default {
           userPhone: ''
         }
       }
+    },
+    initialForm: {
+      default: () => {
+        return {
+          userName: '',
+          userLastN: '',
+          userDocType: '',
+          userDocNum: '',
+          userPhone: ''
+        }
+      }
     }
   },
   data () {
@@ -135,13 +147,20 @@ export default {
         userPhone: 'v-user-phone'
       },
       documents: []
+
     }
   },
-  async mounted () {
+  mounted () {
     const headers = { 'Content-Type': 'application/json' }
-    const response = await fetch('http://52.200.169.154:8081/documents-type/all', { headers })
-    const data = await response.json()
-    this.documents = data
+    fetch('http://52.200.169.154:8081/documents-type/all', { headers })
+      .then(res => res.json())
+      .then(data => { this.documents = data })
+      .catch(err =>
+        this.$toast(err, {
+          timeout: 2000,
+          type: 'error',
+          position: 'bottom-left'
+        }))
   },
   methods: {
     changeName (e) {
@@ -163,25 +182,40 @@ export default {
       this.userData.userPhone = e.target.value
       this.$emit('input-user-phone', this.userData.userPhone)
     },
-    async createUser () {
-      const headers = { 'Content-Type': 'application/json' }
-      await fetch('http://52.200.169.154:8081/user/create', {
+    createUser () {
+      fetch('http://52.200.169.154:8081/user/create', {
         headers,
         method: 'POST',
         body: JSON.stringify(this.userData)
       })
+        .then(() => {
+          this.$toast('Usuario Creado', {
+            timeout: 2000,
+            type: 'success',
+            position: 'bottom-left'
+          })
+          this.userData.userName = ''
+          this.userData.userLastN = ''
+          this.userData.userDocType = ''
+          this.userData.userDocNum = ''
+          this.userData.userPhone = ''
+        })
     },
     readUser () {
-      this.userData.userName = 'Camilo Andrés'
-      this.userData.userLastN = 'Palacio Mier'
-      this.userData.userDocType = '1'
-      this.userData.userDocNum = '1002211875'
-      this.userData.userPhone = '3107045996'
-      this.$toast('Usuario Encontrado', {
-        timeout: 2000,
-        type: 'success',
-        position: 'bottom-left'
+      /* url = enviar un numero de documento
+      fetch('???', {
+        headers,
+        method: 'POST',
+        body: JSON.stringify(this.userData.userDocNum)
       })
+        .then(() => {
+          this.$toast('Usuario Encontrado', {
+            timeout: 2000,
+            type: 'success',
+            position: 'bottom-left'
+          })
+        })
+      */
     }
   }
 }
