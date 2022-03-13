@@ -81,6 +81,10 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+Vue.use(Toast)
 export default {
   name: 'UserForm',
   directives: {
@@ -173,6 +177,11 @@ export default {
       this.userData.userDocType = '1'
       this.userData.userDocNum = '1002211875'
       this.userData.userPhone = '3107045996'
+      this.$toast('Usuario Encontrado', {
+        timeout: 2000,
+        type: 'success',
+        position: 'bottom-left'
+      })
     }
   }
 }
