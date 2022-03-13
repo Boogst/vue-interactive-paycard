@@ -40,10 +40,10 @@
             >
               <option value disabled selected>Tipo</option>
               <option
-                v-bind:value="$index.id"
+                v-bind:value="$index.ID"
                 v-for="($index) in documents"
-                v-bind:key="$index.id"
-              >{{$index.type}}</option>
+                v-bind:key="$index.ID"
+              >{{$index.ABREVIATURA}}</option>
             </select>
           </div>
         </div>
@@ -81,7 +81,6 @@
   </div>
 </template>
 <script>
-import { docType } from '@/data/docType'
 export default {
   name: 'UserForm',
   directives: {
@@ -135,6 +134,10 @@ export default {
     }
   },
   async mounted () {
+    const headers = { 'Content-Type': 'application/json' }
+    const response = await fetch('http://52.200.169.154:8081/documents-type/all', { headers })
+    const data = await response.json()
+    this.documents = data
   },
   methods: {
     changeName (e) {
@@ -156,8 +159,13 @@ export default {
       this.userData.userPhone = e.target.value
       this.$emit('input-user-phone', this.userData.userPhone)
     },
-    createUser () {
-      console.log(docType)
+    async createUser () {
+      const headers = { 'Content-Type': 'application/json' }
+      await fetch('http://52.200.169.154:8081/user/create', {
+        headers,
+        method: 'POST',
+        body: JSON.stringify(this.userData)
+      })
     },
     readUser () {
       this.userData.userName = 'Camilo Andrés'
