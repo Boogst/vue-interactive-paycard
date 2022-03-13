@@ -44,10 +44,10 @@
             >
               <option value disabled selected>{{ $t('cardForm.cardName') }}</option>
               <option
-                v-bind:value="$index.id"
+                v-bind:value="$index.NOMBRES + ' ' + $index.APELLIDOS"
                 v-for="$index in users"
-                v-bind:key="$index.id"
-              >{{$index.nombres}} {{$index.apellidos}}</option>
+                v-bind:key="$index.ID"
+              >{{$index.NOMBRES}} {{$index.APELLIDOS}}</option>
             </select>
 
       </div>
@@ -111,7 +111,6 @@
 
 <script>
 import Card from '@/components/Card'
-import { usersData } from '@/data/users'
 export default {
   name: 'CardForm',
   directives: {
@@ -175,7 +174,7 @@ export default {
       isCardNumberMasked: true,
       mainCardNumber: this.cardNumber,
       cardNumberMaxLength: 19,
-      users: usersData
+      users: []
     }
   },
   computed: {
@@ -191,8 +190,12 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.maskCardNumber()
+    const headers = { 'Content-Type': 'application/json' }
+    const response = await fetch('http://52.200.169.154:8081/user/all', { headers })
+    const data = await response.json()
+    this.users = data
   },
   methods: {
     generateMonthValue (n) {

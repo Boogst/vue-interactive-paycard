@@ -131,8 +131,10 @@ export default {
         userDocNum: 'v-user-doc-number',
         userPhone: 'v-user-phone'
       },
-      documents: docType
+      documents: []
     }
+  },
+  async mounted () {
   },
   methods: {
     changeName (e) {
