@@ -1,35 +1,30 @@
 <template>
-  <div class="wrapper" id="app">
-      <UserForm
-        :user-data="userData"
-        @input-user-name="updateUserName"
-        @input-user-last-name="updateUserLastN"
-        @input-user-doc-type="updateUserDocType"
-        @input-user-doc-num="updateUserDocNum"
-        @input-user-prhone="updateUserPhone"
-      />
-      <CardForm
-        :form-data="formData"
-        @input-card-number="updateCardNumber"
-        @input-card-name="updateCardName"
-        @input-card-month="updateCardMonth"
-        @input-card-year="updateCardYear"
-        @input-card-cvv="updateCardCvv"
-      />
-    <!-- backgroundImage="https://images.unsplash.com/photo-1572336183013-960c3e1a0b54?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80" -->
+  <div>
+    <header>
+      <nav>
+          <router-link to="/user">User</router-link>
+          <router-link to="/card">Card</router-link>
+        </nav>
+    </header>
+    <div class="wrapper" id="app">
+      <transition
+        name="fade"
+        mode="out-in"
+        enter-class="fade-enter"
+        enter-active-class="fade-enter-active"
+        leave-active-class="fade-leave-active"
+      >
+        <router-view >
+        </router-view>
+      </transition>
+      <!-- backgroundImage="https://images.unsplash.com/photo-1572336183013-960c3e1a0b54?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80" -->
+    </div>
   </div>
 </template>
 
 <script>
-import CardForm from '@/components/CardForm'
-import UserForm from './components/UserForm.vue'
-
 export default {
   name: 'app',
-  components: {
-    CardForm,
-    UserForm
-  },
   data () {
     return {
       formData: {
@@ -47,35 +42,50 @@ export default {
         userPhone: ''
       }
     }
-  },
-  methods: {
-    updateCardNumber (val) {
-    },
-    updateCardName (val) {
-    },
-    updateCardMonth (val) {
-    },
-    updateCardYear (val) {
-    },
-    updateCardCvv (val) {
-    },
-    updateUserName (val) {
-    },
-    updateUserLastN (val) {
-    },
-    updateUserDocType (val) {
-    },
-    updateUserDocNum (val) {
-    },
-    updateUserPhone (val) {
-    }
-  }/*,
-  mounted () {
-    this.$i18n.locale = navigator.language
-  },  */
+  }
 }
 </script>
 
 <style lang="scss">
 @import '../src/assets/style.scss';
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  transition: opacity .5s ease;
+}
+
+.fade-leave-active {
+  transition: opacity .5s ease;
+  opacity: 0;
+}
+
+ul {
+  list-style-type: none;
+  text-align: center;
+  margin: 0;
+}
+
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+a{
+  color: #fff;
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: 10px;
+}
+
+nav{
+  background: #444;
+  padding: 14px 0;
+}
+
+.router-link-active{
+  background: #eee;
+  color: #444;
+}
 </style>

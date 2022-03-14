@@ -103,8 +103,14 @@
           </div>
         </div>
       </div>
-
-      <button class="card-form__button" v-on:click="createCard">{{ $t('cardForm.submit') }}</button>
+      <div class="card-form__row">
+              <button class="card-form__button" v-on:click="createCard">Create</button>
+              <button class="card-form__button" v-on:click="createCard">Read</button>
+        </div>
+        <div class="card-form__row">
+              <button class="card-form__button" v-on:click="createCard">Update</button>
+              <button class="card-form__button" v-on:click="createCard">Delete</button>
+        </div>
     </div>
   </div>
 </template>

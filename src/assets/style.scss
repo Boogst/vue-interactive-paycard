@@ -14,13 +14,12 @@ body {
 .wrapper {
   min-height: 100vh;
   display: flex;
-  padding: 50px 15px;
-  justify-content: space-evenly;
+  flex-direction: column;
   align-items: center;
-  
+
   @media screen and (max-width: 1080px), (max-height: 500px) {
     flex-wrap: wrap;
-    flex-direction: column;
+    
   }
 }
 
@@ -103,6 +102,7 @@ body {
 
   &__button {
     width: 100%;
+    margin: 10px;
     height: 55px;
     background: #2364d2;
     border: none;
@@ -122,7 +122,7 @@ body {
 }
 
 .card-form-user {
-  max-width: 500px;
+  max-width: 570px;
   padding: 2%;
   width: 100%;
 

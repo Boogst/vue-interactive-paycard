@@ -75,8 +75,14 @@
           autocomplete="off"
         />
       </div>
-      <button class="card-form__button" v-on:click="createUser">Create</button>
-      <button class="card-form__button" v-on:click="readUser">Read</button>
+      <div class="card-form__row">
+          <button class="card-form__button" v-on:click="createUser">Create</button>
+          <button class="card-form__button" v-on:click="readUser">Read</button>
+      </div>
+      <div class="card-form__row">
+          <button class="card-form__button" v-on:click="createUser">Update</button>
+          <button class="card-form__button" v-on:click="readUser">Delete</button>
+      </div>
     </div>
   </div>
 </template>
