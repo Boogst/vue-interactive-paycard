@@ -44,10 +44,10 @@
             >
               <option value disabled selected>{{ $t('cardForm.cardName') }}</option>
               <option
-                v-bind:value="$index.NOMBRES + ' ' + $index.APELLIDOS"
+                v-bind:value="$index.FS_NAME + ' ' + $index.FS_SURNAME"
                 v-for="$index in users"
                 v-bind:key="$index.ID"
-              >{{$index.NOMBRES}} {{$index.APELLIDOS}}</option>
+              >{{$index.FS_NAME}} {{$index.FS_SURNAME}}</option>
             </select>
 
       </div>
@@ -105,7 +105,7 @@
       </div>
       <div class="card-form__row">
               <button class="card-form__button" v-on:click="createCard">Create</button>
-              <button class="card-form__button" v-on:click="createCard">Read</button>
+              <button class="card-form__button" v-on:click="readCard">Read</button>
         </div>
         <div class="card-form__row">
               <button class="card-form__button" v-on:click="createCard">Update</button>
@@ -117,6 +117,7 @@
 
 <script>
 import Card from '@/components/Card'
+const headers = { 'Content-Type': 'application/json' }
 export default {
   name: 'CardForm',
   directives: {
@@ -180,7 +181,8 @@ export default {
       isCardNumberMasked: true,
       mainCardNumber: this.cardNumber,
       cardNumberMaxLength: 19,
-      users: []
+      users: [],
+      cardTypes: []
     }
   },
   computed: {
@@ -196,12 +198,20 @@ export default {
       }
     }
   },
-  async mounted () {
+  mounted () {
     this.maskCardNumber()
-    const headers = { 'Content-Type': 'application/json' }
-    const response = await fetch('http://52.200.169.154:8081/user/all', { headers })
-    const data = await response.json()
-    this.users = data
+    fetch('http://52.200.169.154:8081/user/all', { headers })
+      .then(res => res.json())
+      .then(data => {
+        const { result } = data
+        this.users = result
+      })
+    fetch('http://52.200.169.154:8081/cards-type/all', { headers })
+      .then(res => res.json())
+      .then(data => {
+        const { result } = data
+        this.cardTypes = result
+      })
   },
   methods: {
     generateMonthValue (n) {
@@ -290,8 +300,32 @@ export default {
         this.unMaskCardNumber()
       }
     },
+    findUserId (fullName) {
+      const user = this.users.find(el => `${el.FS_NAME} ${el.FS_SURNAME}` === fullName)
+      return user
+    },
+    findUserById (id) {
+      const user = this.users.find(el => Number(el.ID) === id)
+      return user
+    },
     createCard () {
-      console.log(this.formData)
+      const { cardName } = this.formData
+      const { ID } = this.findUserId(cardName)
+      console.log(ID)
+    },
+    readCard () {
+      const number = this.formData.cardNumberNotMask.replaceAll(' ', '')
+      fetch(`http://52.200.169.154:8081/card/${number}`, { headers })
+        .then(res => res.json())
+        .then(data => {
+          const { result } = data
+          const customer = this.findUserById(result.customers_id)
+          const date = result.exp_date.split('-')
+          this.formData.cardName = `${customer.FS_NAME} ${customer.FS_SURNAME}`
+          this.formData.cardCvv = result.cvv
+          this.formData.cardYear = date[0]
+          this.formData.cardMonth = date[1]
+        })
     }
   }
 }

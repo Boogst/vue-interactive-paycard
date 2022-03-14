@@ -1,11 +1,11 @@
 <template>
   <div>
-    <header>
+    <div>
       <nav>
-          <router-link to="/user">User</router-link>
-          <router-link to="/card">Card</router-link>
-        </nav>
-    </header>
+        <router-link to="/user">User</router-link>
+        <router-link to="/card">Card</router-link>
+      </nav>
+    </div>
     <div class="wrapper" id="app">
       <transition
         name="fade"
@@ -73,19 +73,20 @@ li {
 }
 
 a{
-  color: #fff;
+  color: rgb(4, 0, 255);
   text-decoration: none;
   padding: 6px 8px;
   border-radius: 10px;
 }
 
 nav{
-  background: #444;
   padding: 14px 0;
+  display: flex;
+  justify-content: center;
 }
 
 .router-link-active{
-  background: #eee;
-  color: #444;
+  background: rgb(4, 0, 255);
+  color: #fff;
 }
 </style>

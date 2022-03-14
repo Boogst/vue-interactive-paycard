@@ -43,7 +43,7 @@
                 v-bind:value="$index.ID"
                 v-for="($index) in documents"
                 v-bind:key="$index.ID"
-              >{{$index.ABREVIATURA}}</option>
+              >{{$index.ABBR}}</option>
             </select>
           </div>
         </div>
@@ -57,7 +57,7 @@
               @input="changeDocNumber"
               :id="fields.userDocNum"
               :value="userData.userDocNum"
-              maxlength="10"
+              maxlength="15"
               autocomplete="off"
             />
           </div>
@@ -161,8 +161,8 @@ export default {
     fetch('http://52.200.169.154:8081/documents-type/all', { headers })
       .then(res => res.json())
       .then(data => { this.documents = data })
-      .catch(err =>
-        this.$toast(err, {
+      .catch(() =>
+        this.$toast('Ha ocurrido un error', {
           timeout: 2000,
           type: 'error',
           position: 'bottom-left'
@@ -208,20 +208,31 @@ export default {
         })
     },
     readUser () {
-      /* url = enviar un numero de documento
-      fetch('???', {
-        headers,
-        method: 'POST',
-        body: JSON.stringify(this.userData.userDocNum)
-      })
-        .then(() => {
+      const url = `http://52.200.169.154:8081/user/${this.userData.userDocNum}`
+      fetch(url, { headers })
+        .then((result) => {
+          return result.json()
+        })
+        .then(data => {
+          const { result } = data
+          this.userData.userName = result.fs_name
+          this.userData.userLastN = result.fs_surname
+          this.userData.userDocType = result.doc_type
+          this.userData.userDocNum = result.doc_num
+          this.userData.userPhone = result.phone
           this.$toast('Usuario Encontrado', {
             timeout: 2000,
             type: 'success',
             position: 'bottom-left'
           })
         })
-      */
+        .catch(() => {
+          this.$toast('Ha ocurrido un problema', {
+            timeout: 2000,
+            type: 'error',
+            position: 'bottom-left'
+          })
+        })
     }
   }
 }
