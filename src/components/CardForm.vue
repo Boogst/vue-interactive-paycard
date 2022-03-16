@@ -23,6 +23,7 @@
           :maxlength="cardNumberMaxLength"
           data-card-field
           autocomplete="off"
+          v-required
         />
         <button
           class="card-input__eye"
@@ -41,6 +42,7 @@
               v-model="formData.cardName"
               @change="changeName"
               data-card-field
+              v-required
             >
               <option value disabled selected>{{ $t('cardForm.cardName') }}</option>
               <option
@@ -61,6 +63,7 @@
               v-model="formData.cardMonth"
               @change="changeMonth"
               data-card-field
+              v-required
             >
               <option value disabled selected>{{ $t('cardForm.month') }}</option>
               <option
@@ -76,6 +79,7 @@
               v-model="formData.cardYear"
               @change="changeYear"
               data-card-field
+              v-required
             >
               <option value disabled selected>{{ $t('cardForm.year') }}</option>
               <option
@@ -99,6 +103,7 @@
               @input="changeCvv"
               data-card-field
               autocomplete="off"
+              v-required
             />
           </div>
         </div>
@@ -108,8 +113,8 @@
               <button class="card-form__button" v-on:click="readCard">Read</button>
         </div>
         <div class="card-form__row">
-              <button class="card-form__button" v-on:click="createCard">Update</button>
-              <button class="card-form__button" v-on:click="createCard">Delete</button>
+              <button class="card-form__button" v-on:click="updateCard">Update</button>
+              <button class="card-form__button" v-on:click="deleteCard">Delete</button>
         </div>
     </div>
   </div>
@@ -143,6 +148,21 @@ export default {
         }
         el.addEventListener('keypress', checkValue)
       }
+    },
+    'required': {
+      bind (el) {
+        function checkValue (event) {
+          if (event.target.value === '') {
+            el.style.borderColor = 'red'
+          } else {
+            el.style.borderColor = null
+          }
+        }
+        el.addEventListener('blur', checkValue)
+        el.addEventListener('keyup', checkValue)
+        el.addEventListener('focus', checkValue)
+        el.addEventListener('change', checkValue)
+      }
     }
   },
   props: {
@@ -155,7 +175,8 @@ export default {
           cardNumberNotMask: '',
           cardMonth: '',
           cardYear: '',
-          cardCvv: ''
+          cardCvv: '',
+          cardId: null
         }
       }
     },
@@ -308,24 +329,154 @@ export default {
       const user = this.users.find(el => Number(el.ID) === id)
       return user
     },
+    cardType () {
+      let number = this.formData.cardNumberNotMask.replaceAll(' ', '')
+      let re = new RegExp('^4')
+      if (number.match(re) != null) return 'Visa'
+
+      re = new RegExp('^(34|37)')
+      if (number.match(re) != null) return 'American Express'
+
+      re = new RegExp('^5[1-5]')
+      if (number.match(re) != null) return 'Mastercard'
+
+      re = new RegExp('^6011')
+      if (number.match(re) != null) return 'Discover'
+
+      re = new RegExp('^62')
+      if (number.match(re) != null) return 'Union Pay'
+
+      re = new RegExp('^9792')
+      if (number.match(re) != null) return 'Troy'
+
+      re = new RegExp('^3(?:0([0-5]|9)|[689]\\d?)\\d{0,11}')
+      if (number.match(re) != null) return 'Diners Club'
+
+      re = new RegExp('^35(2[89]|[3-8])')
+      if (number.match(re) != null) return 'JCB'
+
+      return 'Visa' // default type
+    },
+    findCardTypeId (cardName) {
+      return this.cardTypes.find(el => el.TYPE_NAME === cardName)
+    },
     createCard () {
       const { cardName } = this.formData
-      const { ID } = this.findUserId(cardName)
-      console.log(ID)
+      const customer = this.findUserId(cardName)
+      const number = this.formData.cardNumberNotMask.replaceAll(' ', '')
+      const cardType = this.findCardTypeId(this.cardType())
+      const body = {
+        cardNum: number,
+        cardCvv: this.formData.cardCvv,
+        cardExpDate: `${this.formData.cardMonth}/${this.formData.cardYear}`,
+        cardCustomerId: customer.ID,
+        cardTypeId: cardType.ID
+      }
+      fetch('http://52.200.169.154:8081/card/create', {
+        headers,
+        method: 'POST',
+        body: JSON.stringify(body)
+      })
+        .then(() => {
+          this.$toast('Tajeta Creada', {
+            timeout: 2000,
+            type: 'success',
+            position: 'bottom-left'
+          })
+          this.formData.cardName = ''
+          this.formData.cardNumber = ''
+          this.formData.cardMonth = ''
+          this.formData.cardYear = ''
+          this.formData.cardCvv = ''
+        })
+        .catch(() => {
+          this.$toast('Ha ocurrido un problema al crear la tarjeta', {
+            timeout: 2000,
+            type: 'error',
+            position: 'bottom-left'
+          })
+        })
     },
     readCard () {
       const number = this.formData.cardNumberNotMask.replaceAll(' ', '')
+      console.log(this.cardType())
       fetch(`http://52.200.169.154:8081/card/${number}`, { headers })
         .then(res => res.json())
         .then(data => {
           const { result } = data
-          const customer = this.findUserById(result.customers_id)
-          const date = result.exp_date.split('-')
+          const customer = this.findUserById(result.cardCustomerId)
+          const date = result.cardExpDate.split('-')
           this.formData.cardName = `${customer.FS_NAME} ${customer.FS_SURNAME}`
-          this.formData.cardCvv = result.cvv
+          this.formData.cardCvv = result.cardCvv
           this.formData.cardYear = date[0]
           this.formData.cardMonth = date[1]
+          this.formData.cardId = result.cardId
+          this.$toast('Tarjeta encontrada', {
+            timeout: 2000,
+            type: 'success',
+            position: 'bottom-left'
+          })
         })
+        .catch(() => {
+          this.$toast('Ha ocurrido un problema al leer los datos de la tarjeta', {
+            timeout: 2000,
+            type: 'error',
+            position: 'bottom-left'
+          })
+        })
+    },
+    updateCard () {
+      const { cardId, ...rest } = this.formData
+      const { cardName } = rest
+      const customer = this.findUserId(cardName)
+      const number = rest.cardNumberNotMask.replaceAll(' ', '')
+      const cardType = this.findCardTypeId(this.cardType())
+      const body = {
+        cardNum: number,
+        cardCvv: this.formData.cardCvv,
+        cardExpDate: `${this.formData.cardMonth}/${this.formData.cardYear}`,
+        cardCustomerId: customer.ID,
+        cardTypeId: cardType.ID
+      }
+      const url = `http://52.200.169.154:8081/card/update/${cardId}`
+      fetch(url, {
+        headers,
+        method: 'PATCH',
+        body: JSON.stringify(body)
+      })
+        .then(() => {
+          this.$toast('Tarjeta Modificado', {
+            timeout: 2000,
+            type: 'success',
+            position: 'bottom-left'
+          })
+          this.formData.cardName = ''
+          this.formData.cardMonth = ''
+          this.formData.cardYear = ''
+          this.formData.cardCvv = ''
+        })
+    },
+    deleteCard () {
+      const num = this.formData.cardNumberNotMask.replaceAll(' ', '')
+      if (window.confirm(`Estás segudo de que deseas eliminar la tarjeta: \n Numero de tarjeta: ${num}`)) {
+        fetch(`http://52.200.169.154:8081/card/delete/${num}`, {
+          headers,
+          method: 'DELETE'
+        })
+          .then(() => {
+            this.$toast('Tarjeta Eliminada', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+            this.formData.cardName = ''
+            this.formData.cardMonth = ''
+            this.formData.cardYear = ''
+            this.formData.cardCvv = ''
+          })
+      } else {
+        alert('NO SÉ BORRÓ')
+      }
     }
   }
 }

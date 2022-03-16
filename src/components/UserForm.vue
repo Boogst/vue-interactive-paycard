@@ -14,6 +14,7 @@
           :value="userData.userName"
           v-letter-only
           autocomplete="off"
+          v-required
         />
       </div>
       <div class="card-input">
@@ -26,6 +27,7 @@
           :value="userData.userLastN"
           v-letter-only
           autocomplete="off"
+          v-required
         />
       </div>
       <div class="card-form__row">
@@ -37,6 +39,7 @@
               :id="fields.userDocType"
               v-model="userData.userDocType"
               @change="changeDocType"
+              v-required
             >
               <option value disabled selected>Tipo</option>
               <option
@@ -59,6 +62,7 @@
               :value="userData.userDocNum"
               maxlength="15"
               autocomplete="off"
+              v-required
             />
           </div>
         </div>
@@ -73,6 +77,7 @@
           :id="fields.userPhone"
           :value="userData.userPhone"
           autocomplete="off"
+          v-required
         />
       </div>
       <div class="card-form__row">
@@ -80,8 +85,8 @@
           <button class="card-form__button" v-on:click="readUser">Read</button>
       </div>
       <div class="card-form__row">
-          <button class="card-form__button" v-on:click="createUser">Update</button>
-          <button class="card-form__button" v-on:click="readUser">Delete</button>
+          <button class="card-form__button" v-on:click="updateUser">Update</button>
+          <button class="card-form__button" v-on:click="deleteUser">Delete</button>
       </div>
     </div>
   </div>
@@ -117,6 +122,21 @@ export default {
         }
         el.addEventListener('keypress', checkValue)
       }
+    },
+    'required': {
+      bind (el) {
+        function checkValue (event) {
+          if (event.target.value === '') {
+            el.style.borderColor = 'red'
+          } else {
+            el.style.borderColor = null
+          }
+        }
+        el.addEventListener('blur', checkValue)
+        el.addEventListener('keyup', checkValue)
+        el.addEventListener('focus', checkValue)
+        el.addEventListener('change', checkValue)
+      }
     }
   },
   props: {
@@ -127,7 +147,8 @@ export default {
           userLastN: '',
           userDocType: '',
           userDocNum: '',
-          userPhone: ''
+          userPhone: '',
+          userId: null
         }
       }
     },
@@ -138,7 +159,8 @@ export default {
           userLastN: '',
           userDocType: '',
           userDocNum: '',
-          userPhone: ''
+          userPhone: '',
+          userId: null
         }
       }
     }
@@ -160,7 +182,7 @@ export default {
     const headers = { 'Content-Type': 'application/json' }
     fetch('http://52.200.169.154:8081/documents-type/all', { headers })
       .then(res => res.json())
-      .then(data => { this.documents = data })
+      .then(({ result }) => { this.documents = result })
       .catch(() =>
         this.$toast('Ha ocurrido un error', {
           timeout: 2000,
@@ -206,20 +228,26 @@ export default {
           this.userData.userDocNum = ''
           this.userData.userPhone = ''
         })
+        .catch(() => {
+          this.$toast('Ha ocurrido un problema al crear el usuario', {
+            timeout: 2000,
+            type: 'error',
+            position: 'bottom-left'
+          })
+        })
     },
     readUser () {
       const url = `http://52.200.169.154:8081/user/${this.userData.userDocNum}`
       fetch(url, { headers })
-        .then((result) => {
-          return result.json()
-        })
+        .then(res => res.json())
         .then(data => {
           const { result } = data
-          this.userData.userName = result.fs_name
-          this.userData.userLastN = result.fs_surname
-          this.userData.userDocType = result.doc_type
-          this.userData.userDocNum = result.doc_num
-          this.userData.userPhone = result.phone
+          this.userData.userName = result.userName
+          this.userData.userLastN = result.userLastN
+          this.userData.userDocType = result.userDocType
+          this.userData.userPhone = result.userPhone
+          this.userData.userId = result.userId
+          console.log(this.userData.userId)
           this.$toast('Usuario Encontrado', {
             timeout: 2000,
             type: 'success',
@@ -227,12 +255,55 @@ export default {
           })
         })
         .catch(() => {
-          this.$toast('Ha ocurrido un problema', {
+          this.$toast('Ha ocurrido un problema al leer los datos del usuario', {
             timeout: 2000,
             type: 'error',
             position: 'bottom-left'
           })
         })
+    },
+    updateUser () {
+      const { userId, ...rest } = this.userData
+      const url = `http://52.200.169.154:8081/user/update/${userId}`
+      console.log(url, rest)
+      fetch(url, {
+        headers,
+        method: 'PATCH',
+        body: JSON.stringify(rest)
+      })
+        .then(() => {
+          this.$toast('Usuario Modificado', {
+            timeout: 2000,
+            type: 'success',
+            position: 'bottom-left'
+          })
+          this.userData.userName = ''
+          this.userData.userLastN = ''
+          this.userData.userDocType = ''
+          this.userData.userPhone = ''
+        })
+    },
+    deleteUser () {
+      const num = this.userData.userDocNum
+      if (window.confirm(`Estás segudo de que deseas eliminar la tarjeta: \n Numero de tarjeta: ${num}`)) {
+        fetch(`http://52.200.169.154:8081/user/delete/${num}`, {
+          headers,
+          method: 'DELETE'
+        })
+          .then(() => {
+            this.$toast('Usuario Eliminado', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+            this.userData.userName = ''
+            this.userData.userLastN = ''
+            this.userData.userDocType = ''
+            this.userData.userPhone = ''
+          })
+      } else {
+        alert('NO SÉ BORRÓ')
+      }
     }
   }
 }

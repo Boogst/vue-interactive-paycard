@@ -204,7 +204,7 @@ export default {
       re = new RegExp('^35(2[89]|[3-8])')
       if (number.match(re) != null) return 'jcb'
 
-      return '' // default type
+      return 'mastercard' // default type
     },
     currentCardBackground () {
       if (this.randomBackgrounds && !this.backgroundImage) { // TODO will be optimized

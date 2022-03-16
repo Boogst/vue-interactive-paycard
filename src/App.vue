@@ -32,14 +32,16 @@ export default {
         cardNumber: '',
         cardMonth: '',
         cardYear: '',
-        cardCvv: ''
+        cardCvv: '',
+        cardId: null
       },
       userData: {
         userName: '',
         userLastN: '',
         userDocType: '',
         userDocNum: '',
-        userPhone: ''
+        userPhone: '',
+        userId: null
       }
     }
   }
