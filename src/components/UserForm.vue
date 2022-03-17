@@ -14,6 +14,7 @@
           :value="userData.userName"
           v-letter-only
           autocomplete="off"
+          maxlength="30"
           v-required
         />
       </div>
@@ -26,6 +27,7 @@
           class="card-input__input"
           :value="userData.userLastN"
           v-letter-only
+          maxlength="30"
           autocomplete="off"
           v-required
         />
@@ -77,6 +79,7 @@
           :id="fields.userPhone"
           :value="userData.userPhone"
           autocomplete="off"
+          maxlength="15"
           v-required
         />
       </div>
