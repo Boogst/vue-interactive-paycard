@@ -377,20 +377,30 @@ export default {
         method: 'POST',
         body: JSON.stringify(body)
       })
-        .then(() => {
-          this.$toast('Tajeta Creada', {
-            timeout: 2000,
-            type: 'success',
-            position: 'bottom-left'
-          })
-          this.formData.cardName = ''
-          this.formData.cardNumber = ''
-          this.formData.cardMonth = ''
-          this.formData.cardYear = ''
-          this.formData.cardCvv = ''
+        .then(res => res.json())
+        .then((data) => {
+          const { result, status } = data
+          if (status) {
+            this.$toast('Tajeta Creada', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+            this.formData.cardName = ''
+            this.formData.cardNumber = ''
+            this.formData.cardMonth = ''
+            this.formData.cardYear = ''
+            this.formData.cardCvv = ''
+          } else {
+            this.$toast(`Error: ${result}`, {
+              timeout: 2000,
+              type: 'error',
+              position: 'bottom-left'
+            })
+          }
         })
         .catch(() => {
-          this.$toast('Ha ocurrido un problema al crear la tarjeta', {
+          this.$toast(`Error: Ocurrió un problema desconocido`, {
             timeout: 2000,
             type: 'error',
             position: 'bottom-left'
@@ -399,26 +409,33 @@ export default {
     },
     readCard () {
       const number = this.formData.cardNumberNotMask.replaceAll(' ', '')
-      console.log(this.cardType())
       fetch(`http://52.200.169.154:8081/card/${number}`, { headers })
         .then(res => res.json())
         .then(data => {
-          const { result } = data
-          const customer = this.findUserById(result.cardCustomerId)
-          const date = result.cardExpDate.split('-')
-          this.formData.cardName = `${customer.FS_NAME} ${customer.FS_SURNAME}`
-          this.formData.cardCvv = result.cardCvv
-          this.formData.cardYear = date[0]
-          this.formData.cardMonth = date[1]
-          this.formData.cardId = result.cardId
-          this.$toast('Tarjeta encontrada', {
-            timeout: 2000,
-            type: 'success',
-            position: 'bottom-left'
-          })
+          const { status, result } = data
+          if (status) {
+            const customer = this.findUserById(result.cardCustomerId)
+            const date = result.cardExpDate.split('-')
+            this.formData.cardName = `${customer.FS_NAME} ${customer.FS_SURNAME}`
+            this.formData.cardCvv = result.cardCvv
+            this.formData.cardYear = date[0]
+            this.formData.cardMonth = date[1]
+            this.formData.cardId = result.cardId
+            this.$toast('Tarjeta encontrada', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+          } else {
+            this.$toast(`Error: ${result}`, {
+              timeout: 2000,
+              type: 'error',
+              position: 'bottom-left'
+            })
+          }
         })
         .catch(() => {
-          this.$toast('Ha ocurrido un problema al leer los datos de la tarjeta', {
+          this.$toast(`Error: Ocurrió un problema desconocido`, {
             timeout: 2000,
             type: 'error',
             position: 'bottom-left'
@@ -444,16 +461,33 @@ export default {
         method: 'PATCH',
         body: JSON.stringify(body)
       })
-        .then(() => {
-          this.$toast('Tarjeta Modificado', {
+        .then(res => res.json())
+        .then((data) => {
+          const { status, message } = data
+          if (status) {
+            this.$toast('Tarjeta Modificado', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+            this.formData.cardName = ''
+            this.formData.cardMonth = ''
+            this.formData.cardYear = ''
+            this.formData.cardCvv = ''
+          } else {
+            this.$toast(`Error: ${message}`, {
+              timeout: 2000,
+              type: 'error',
+              position: 'bottom-left'
+            })
+          }
+        })
+        .catch(() => {
+          this.$toast(`Error: Ocurrió un problema desconocido`, {
             timeout: 2000,
-            type: 'success',
+            type: 'error',
             position: 'bottom-left'
           })
-          this.formData.cardName = ''
-          this.formData.cardMonth = ''
-          this.formData.cardYear = ''
-          this.formData.cardCvv = ''
         })
     },
     deleteCard () {
@@ -463,19 +497,34 @@ export default {
           headers,
           method: 'DELETE'
         })
-          .then(() => {
-            this.$toast('Tarjeta Eliminada', {
+          .then(res => res.json())
+          .then((data) => {
+            const { status, message } = data
+            if (status) {
+              this.$toast('Tarjeta Eliminada', {
+                timeout: 2000,
+                type: 'success',
+                position: 'bottom-left'
+              })
+              this.formData.cardName = ''
+              this.formData.cardMonth = ''
+              this.formData.cardYear = ''
+              this.formData.cardCvv = ''
+            } else {
+              this.$toast(`Error: ${message}`, {
+                timeout: 2000,
+                type: 'error',
+                position: 'bottom-left'
+              })
+            }
+          })
+          .catch(() => {
+            this.$toast(`Error: Ocurrió un problema desconocido`, {
               timeout: 2000,
-              type: 'success',
+              type: 'error',
               position: 'bottom-left'
             })
-            this.formData.cardName = ''
-            this.formData.cardMonth = ''
-            this.formData.cardYear = ''
-            this.formData.cardCvv = ''
           })
-      } else {
-        alert('NO SÉ BORRÓ')
       }
     }
   }

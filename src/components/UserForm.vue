@@ -62,7 +62,6 @@
               @input="changeDocNumber"
               :id="fields.userDocNum"
               :value="userData.userDocNum"
-              maxlength="15"
               autocomplete="off"
               v-required
             />
@@ -79,7 +78,6 @@
           :id="fields.userPhone"
           :value="userData.userPhone"
           autocomplete="off"
-          maxlength="15"
           v-required
         />
       </div>
@@ -219,20 +217,30 @@ export default {
         method: 'POST',
         body: JSON.stringify(this.userData)
       })
-        .then(() => {
-          this.$toast('Usuario Creado', {
-            timeout: 2000,
-            type: 'success',
-            position: 'bottom-left'
-          })
-          this.userData.userName = ''
-          this.userData.userLastN = ''
-          this.userData.userDocType = ''
-          this.userData.userDocNum = ''
-          this.userData.userPhone = ''
+        .then(res => res.json())
+        .then((data) => {
+          const { result, status } = data
+          if (status) {
+            this.$toast('Usuario Creado', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+            this.userData.userName = ''
+            this.userData.userLastN = ''
+            this.userData.userDocType = ''
+            this.userData.userDocNum = ''
+            this.userData.userPhone = ''
+          } else {
+            this.$toast(`Error: ${result}`, {
+              timeout: 2000,
+              type: 'error',
+              position: 'bottom-left'
+            })
+          }
         })
         .catch(() => {
-          this.$toast('Ha ocurrido un problema al crear el usuario', {
+          this.$toast(`Error: Ocurrió un problema desconocido`, {
             timeout: 2000,
             type: 'error',
             position: 'bottom-left'
@@ -244,21 +252,28 @@ export default {
       fetch(url, { headers })
         .then(res => res.json())
         .then(data => {
-          const { result } = data
-          this.userData.userName = result.userName
-          this.userData.userLastN = result.userLastN
-          this.userData.userDocType = result.userDocType
-          this.userData.userPhone = result.userPhone
-          this.userData.userId = result.userId
-          console.log(this.userData.userId)
-          this.$toast('Usuario Encontrado', {
-            timeout: 2000,
-            type: 'success',
-            position: 'bottom-left'
-          })
+          const { result, status } = data
+          if (status) {
+            this.userData.userName = result.userName
+            this.userData.userLastN = result.userLastN
+            this.userData.userDocType = result.userDocType
+            this.userData.userPhone = result.userPhone
+            this.userData.userId = result.userId
+            this.$toast('Usuario Encontrado', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+          } else {
+            this.$toast(`Error: ${result}`, {
+              timeout: 2000,
+              type: 'error',
+              position: 'bottom-left'
+            })
+          }
         })
         .catch(() => {
-          this.$toast('Ha ocurrido un problema al leer los datos del usuario', {
+          this.$toast(`Error: Ocurrió un problema desconocido`, {
             timeout: 2000,
             type: 'error',
             position: 'bottom-left'
@@ -274,16 +289,33 @@ export default {
         method: 'PATCH',
         body: JSON.stringify(rest)
       })
-        .then(() => {
-          this.$toast('Usuario Modificado', {
+        .then(res => res.json())
+        .then((data) => {
+          const { status, message } = data
+          if (status) {
+            this.$toast('Usuario Modificado', {
+              timeout: 2000,
+              type: 'success',
+              position: 'bottom-left'
+            })
+            this.userData.userName = ''
+            this.userData.userLastN = ''
+            this.userData.userDocType = ''
+            this.userData.userPhone = ''
+          } else {
+            this.$toast(`Error: ${message}`, {
+              timeout: 2000,
+              type: 'error',
+              position: 'bottom-left'
+            })
+          }
+        })
+        .catch(() => {
+          this.$toast(`Error: Ocurrió un problema desconocido`, {
             timeout: 2000,
-            type: 'success',
+            type: 'error',
             position: 'bottom-left'
           })
-          this.userData.userName = ''
-          this.userData.userLastN = ''
-          this.userData.userDocType = ''
-          this.userData.userPhone = ''
         })
     },
     deleteUser () {
@@ -293,19 +325,34 @@ export default {
           headers,
           method: 'DELETE'
         })
-          .then(() => {
-            this.$toast('Usuario Eliminado', {
+          .then(res => res.json())
+          .then((data) => {
+            const { status, message } = data
+            if (status) {
+              this.$toast('Usuario Eliminado', {
+                timeout: 2000,
+                type: 'success',
+                position: 'bottom-left'
+              })
+              this.userData.userName = ''
+              this.userData.userLastN = ''
+              this.userData.userDocType = ''
+              this.userData.userPhone = ''
+            } else {
+              this.$toast(`Error: ${message}`, {
+                timeout: 2000,
+                type: 'error',
+                position: 'bottom-left'
+              })
+            }
+          })
+          .catch(() => {
+            this.$toast(`Error: Ocurrió un problema desconocido`, {
               timeout: 2000,
-              type: 'success',
+              type: 'error',
               position: 'bottom-left'
             })
-            this.userData.userName = ''
-            this.userData.userLastN = ''
-            this.userData.userDocType = ''
-            this.userData.userPhone = ''
           })
-      } else {
-        alert('NO SÉ BORRÓ')
       }
     }
   }
